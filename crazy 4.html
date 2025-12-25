@@ -544,6 +544,45 @@
             ctx.lineWidth = 1; 
         }
 
+        // --- Watermark Function ---
+        function drawWatermark() {
+            ctx.save();
+            
+            // 1. 右下角固定署名
+            ctx.font = "bold 16px 'Noto Sans SC'";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+            ctx.textAlign = "right";
+            ctx.shadowBlur = 2;
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.fillText("@千华开发", config.width - 20, config.height - 20);
+            ctx.shadowBlur = 0; // 重置阴影
+
+            // 2. 随机分布的背景水印 (防盗图风格)
+            // 旋转画布以便绘制斜体水印
+            ctx.translate(config.width/2, config.height/2);
+            ctx.rotate(-Math.PI / 6); // 逆时针旋转30度
+            ctx.translate(-config.width/2, -config.height/2);
+
+            ctx.font = "20px 'Noto Sans SC'";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.15)"; // 更加透明，不影响观看
+            ctx.textAlign = "center";
+            
+            // 在画布范围外也绘制一些，确保覆盖全图
+            const positions = [
+                {x: 200, y: 150},
+                {x: 600, y: 150},
+                {x: 200, y: 450},
+                {x: 600, y: 450},
+                {x: 400, y: 300}
+            ];
+
+            positions.forEach(pos => {
+                ctx.fillText("@千华开发", pos.x, pos.y);
+            });
+
+            ctx.restore();
+        }
+
         // --- Main Control ---
 
         async function startDrawing() {
@@ -565,6 +604,9 @@
             // 这里替换了原来的 drawLights，改为包含炸鸡的函数
             await drawDecorations(); 
             await drawCouple();
+
+            // 最后绘制水印
+            drawWatermark();
             
             isDrawing = false;
             snowEnabled = true;
